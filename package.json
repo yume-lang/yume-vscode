@@ -1,0 +1,25 @@
+{
+    "name": "yume",
+    "displayName": "Yume",
+    "description": "",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.66.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "yume",
+            "aliases": ["Yume", "yume"],
+            "extensions": [".ym",".yume"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "yume",
+            "scopeName": "source.yume",
+            "path": "./syntaxes/yume.tmLanguage.json"
+        }]
+    }
+}

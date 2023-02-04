@@ -1,4 +1,5 @@
 {
+  "$comment": "This file is auto-generated",
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "Yume",
   "patterns": [
@@ -14,50 +15,81 @@
     {"include": "#self_field_access"         },
     {"include": "#implicit_self_field_access"},
     {"include": "#field_access"              },
+    {"include": "#direct_call"               },
+    {"include": "#constant"                  },
+    {"include": "#member_constant"           },
     {"include": "#type"                      },
     {"include": "#separator"                 }
   ],
   "repository": {
+    "character": {"match": "\\?(\\\\)?.", "name": "string.character.yume"},
     "comment": {
-      "name": "comment.line.number-sign.yume",
+      "captures": { "1": {"name": "punctuation.definition.comment.yume"} },
       "match": "(?:^[ \\t]+)?(#).*$\\n?",
-      "captures": { "1": {"name": "punctuation.definition.comment.yume"} }
+      "name": "comment.line.number-sign.yume"
     },
-    "keywords": {
-      "patterns": [
-        {
-          "name": "keyword.control.yume",
-          "match": "\\b(def|let|self|if|then|else|do|end|while|return|struct|__primitive__|__varargs__|__extern__)\\b"
-        },
-        {
-          "name" : "constant.language.boolean.yume",
-          "match": "\\b(true|false)\\b"
-        }
-      ]
+    "constant": {
+      "match": "\\$\\p{Lu}\\w*"              ,
+      "name" : "variable.other.constant.yume"
     },
-    "string": {
-      "name": "string.quoted.double.yume",
-      "begin": "\"",
-      "end": "\"",
-      "patterns": [
-        {"name": "constant.character.escape.yume", "match": "\\\\."}
-      ]
+    "direct_call": {
+      "captures": {
+        "1": {"name": "variable.yume"         },
+        "2": {"name": "punctuation.arrow.yume"}
+      },
+      "match": "\\b(\\p{Ll}\\w*)(\\-\\>)(?=\\()",
+      "name": "meta.call.direct.yume"
+    },
+    "field_access": {
+      "captures": {
+        "1": {"name": "variable.yume"                    },
+        "2": {"name": "punctuation.separator.method.yume"},
+        "3": {"name": "variable.yume"                    }
+      },
+      "match": "\\b(\\p{Ll}\\w*)(\\:\\:)(\\p{Ll}\\w*)\\b",
+      "name": "meta.field.yume"
+    },
+    "implicit_self_field_access": {
+      "match": "\\B\\:\\:\\p{Ll}\\w*"     ,
+      "name" : "variable.access.self.yume"
+    },
+    "index": {
+      "begin": "\\b(\\p{Ll}\\w*)\\s*(\\[)\\s*",
+      "beginCaptures": {
+        "1": {"name": "variable.yume"        },
+        "2": {"name": "punctuation.lsqr.yume"}
+      },
+      "end": "\\]",
+      "endCaptures": { "0": {"name": "punctuation.rsqr.yume"} },
+      "name": "meta.variable.index.yume",
+      "patterns": [ {"include": "$self"} ]
     },
     "integer": {
       "patterns": [
         {
-          "name" : "constant.numeric.integer.yume",
-          "match": "-?[0-9][0-9_]*\\b"
+          "match": "-?[0-9][0-9_]*\\b"            ,
+          "name" : "constant.numeric.integer.yume"
         },
         {
-          "name" : "constant.numeric.integer.hex.yume",
-          "match": "\\b0x[a-fA-F0-9_]+\\b"
+          "match": "\\b0x[a-fA-F0-9_]+\\b"            ,
+          "name" : "constant.numeric.integer.hex.yume"
         }
       ]
     },
-    "character": {"name": "string.character.yume", "match": "\\?(\\\\)?."},
+    "keywords": {
+      "patterns": [
+        {
+          "match": "\\b(?:def|let|self|if|then|else|do|end|while|return|struct|__primitive__|__varargs__|__extern__)\\b",
+          "name": "keyword.control.yume"
+        },
+        {
+          "match": "\\b(?:true|false)\\b"          ,
+          "name" : "constant.language.boolean.yume"
+        }
+      ]
+    },
     "long_def": {
-      "begin": "\\b(def)\\s+((?:@\\w+\\s+)*)(\\:?\\w+|(?:\\+|-|\\[\\]|\\*|%|&|\\/\\/|>|<)=?|==|!=|!)\\s*(\\{(?:\\w|\\s|,)*\\})?\\s*(\\()",
+      "begin": "\\b(def)\\s+((?:@\\w+\\s+)*)((?:(?:\\+|\\-|\\[\\]|\\*|%|&|\\/\\/|\\>|\\<|:?\\w+)(?:\\=)?|(?:\\=\\=|\\!\\=|\\!)))\\s*((?:\\{(?:\\w|\\s|,)*\\})?)\\s*(\\()",
       "beginCaptures": {
         "1": {"name": "keyword.control.def.yume"              },
         "2": {"name": "keyword.control.attribute.yume"        },
@@ -73,10 +105,57 @@
       "patterns": [
         {
           "begin": "(?![\\s,)])",
-          "end": "(?=,|\\)\\s*)",
-          "patterns": [ {"include": "#plain_name"}, {"include": "$self"} ]
+          "end": "(?=(?:,|\\)\\s*))",
+          "patterns": [
+            {"include": "#self_kwd"  },
+            {"include": "#plain_name"},
+            {"include": "$self"      }
+          ]
         }
       ]
+    },
+    "member_constant": {
+      "captures": {
+        "1": {"name": "entity.name.type.yume"              },
+        "2": {"name": "punctuation.separator.method.yume"  },
+        "3": {"name": "variable.other.constant.member.yume"}
+      },
+      "match": "\\b(\\p{Lu}\\w*)(\\:\\:)(\\p{Lu}\\w*)",
+      "name": "meta.constant.member.yume"
+    },
+    "plain_name": {"match": "\\b\\p{Ll}\\w*", "name": "variable.yume"},
+    "self_field_access": {
+      "captures": { "1": {"name": "variable.yume"} },
+      "match": "(?<=\\bself)\\:\\:(\\p{Ll}\\w*)",
+      "name": "meta.field.self.yume"
+    },
+    "self_kwd": {
+      "match": "\\bself(?:\\s*(?:\\[\\]|ptr|mut|type|ref))*",
+      "name" : "keyword.control.self.yume"
+    },
+    "separator": {
+      "match": "(?:\\.|\\:\\:)"                   ,
+      "name" : "punctuation.separator.method.yume"
+    },
+    "string": {
+      "begin": "\"",
+      "end": "\"",
+      "name": "string.quoted.double.yume",
+      "patterns": [
+        {"match": "\\\\.", "name": "constant.character.escape.yume"}
+      ]
+    },
+    "type": {
+      "match": "(?:\\b\\p{Lu}\\w*(?:\\{\\s*(?:\\g<0>(?:\\s*,\\s*\\g<0>)*\\s*)?\\})?|\\(\\s*(?:\\g<0>(?:\\s*,\\s*\\g<0>)*\\s*)?\\-\\>(?:ptr)?\\s*(?:\\g<0>)?\\s*\\))(?:\\s*(?:\\[\\]|ptr|mut|type|ref))*",
+      "name": "entity.name.type.yume"
+    },
+    "var_assign": {
+      "captures": {
+        "1": {"name": "variable.yume"          },
+        "2": {"name": "punctuation.equals.yume"}
+      },
+      "match": "\\b(\\p{Ll}\\w*)\\s*(\\=)\\s*\\b",
+      "name": "meta.variable.assignment.yume"
     },
     "var_decl": {
       "begin": "\\b(?:(let)|(const))\\s+(\\w+)\\s*",
@@ -85,63 +164,11 @@
         "2": {"name": "keyword.control.const.yume"},
         "3": {"name": "variable.declaration.yume" }
       },
-      "end": "=",
+      "end": "\\=",
       "endCaptures": { "0": {"name": "punctuation.equals.yume"} },
       "name": "meta.variable.declaration.yume",
       "patterns": [ {"include": "$self"} ]
-    },
-    "var_assign": {
-      "match": "\\b(\\p{Ll}\\w*)\\s*(=)\\s*\\b",
-      "captures": {
-        "1": {"name": "variable.yume"          },
-        "2": {"name": "punctuation.equals.yume"}
-      },
-      "name": "meta.variable.assignment.yume"
-    },
-    "index": {
-      "begin": "\\b(\\p{Ll}\\w*)\\s*(\\[)\\s*",
-      "beginCaptures": {
-        "1": {"name": "variable.yume"        },
-        "2": {"name": "punctuation.lsqr.yume"}
-      },
-      "end": "\\]",
-      "endCaptures": { "0": {"name": "punctuation.rsqr.yume"} },
-      "patterns": [ {"include": "$self"} ],
-      "name": "meta.variable.index.yume"
-    },
-    "implicit_self_field_access": {
-      "name" : "variable.access.self.yume",
-      "match": "\\B(::\\p{Ll}\\w*)"
-    },
-    "self_field_access": {
-      "name": "meta.field.self.yume",
-      "match": "(?<=\\bself)::(\\p{Ll}\\w*)",
-      "captures": { "1": {"name": "variable.yume"} }
-    },
-    "field_access": {
-      "match": "\\b(\\p{Ll}\\w*)(::)(\\p{Ll}\\w*)\\b",
-      "captures": {
-        "1": {"name": "variable.yume"                    },
-        "2": {"name": "punctuation.separator.method.yume"},
-        "3": {"name": "variable.yume"                    }
-      },
-      "name": "meta.field.yume"
-    },
-    "plain_name": {
-      "patterns": [ {"name": "variable.yume", "match": "\\b(\\p{Ll}\\w*)"} ]
-    },
-    "type": {
-      "patterns": [
-        {
-          "match": "\\b(\\p{Lu}\\w*(?:\\{(?:\\w|\\s)*\\})?(?:\\s*(?:(?:\\[\\])|ptr|mut|type))*)",
-          "name": "entity.name.type.yume"
-        }
-      ]
     }
-  },
-  "separator": {
-    "name" : "punctuation.separator.method.yume",
-    "match": "\\.|::"
   },
   "scopeName": "source.yume"
 }
